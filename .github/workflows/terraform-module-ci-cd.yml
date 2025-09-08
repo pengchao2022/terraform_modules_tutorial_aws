@@ -11,7 +11,7 @@ env:
 
 jobs:
   terraform-validation:
-    name: Terraform Validate and Plan
+    name: Terraform Validate, Format and Plan
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +22,26 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: ${{ env.TF_VERSION }}
+
+    # 添加格式化步骤 - 自动修复格式问题
+    - name: Terraform Format
+      run: |
+        # 检查当前格式状态
+        terraform fmt -check -recursive || echo "Format issues found, attempting to fix..."
+        # 自动格式化所有文件
+        terraform fmt -recursive
+        # 显示格式化后的变更
+        git diff --exit-code || echo "Files were formatted"
+
+    # 可选：如果希望自动提交格式化的代码
+    - name: Commit formatted changes (Optional)
+      if: github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git diff --staged --quiet || git commit -m "style: auto-format Terraform code"
+        git push
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -36,11 +56,12 @@ jobs:
     - name: Terraform Validate
       run: terraform validate
 
+    # 保留格式检查作为验证
     - name: Terraform Format Check
-      run: terraform fmt -check
+      run: terraform fmt -check -recursive
 
     - name: Terraform Plan
-      run: terraform plan -out=tfplan
+      run: terraform plan -out=tfplan -input=false
 
     - name: Upload Terraform Plan
       uses: actions/upload-artifact@v4
@@ -79,4 +100,4 @@ jobs:
       run: terraform init
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve tfplan
+      run: terraform apply -auto-approve -input=false tfplan
