@@ -55,7 +55,7 @@ module "web_server_sg" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0"]
+      cidr_blocks = ["0.0.0.0/0"]
     }
   ]
 
@@ -80,7 +80,7 @@ resource "aws_instance" "ubuntu_server" {
   key_name      = aws_key_pair.ssh_key.key_name
   associate_public_ip_address = true
   
-  vpc_security_group_ids = [web_server_sg.id]
+  vpc_security_group_ids = [module.web_server_sg.security_group_id]
 
   tags = {
     Name = "ubuntu-server"
