@@ -86,4 +86,4 @@ resource "aws_instance" "ubuntu_server" {
     Name = "ubuntu-server"
     Environment = "production"
   }
-  }
+}
