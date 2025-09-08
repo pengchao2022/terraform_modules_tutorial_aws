@@ -74,10 +74,11 @@ resource "aws_key_pair" "ssh_key" {
 }
 
 resource "aws_instance" "web_server" {
-  ami           = "ami-0c55b159cbfafe1f0"
+  ami           = "ami-0fc5d935ebf8bc3bc"
   instance_type = "t3.micro"
   subnet_id     = module.vpc.public_subnets[0]
   key_name      = aws_key_pair.ssh_key.key_name
+  associate_public_ip_address = true
   
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
