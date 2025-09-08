@@ -73,7 +73,7 @@ resource "aws_key_pair" "ssh_key" {
   }
 }
 
-resource "aws_instance" "web_server" {
+resource "aws_instance" "ubuntu_server" {
   ami           = "ami-0fc5d935ebf8bc3bc"
   instance_type = "t3.micro"
   subnet_id     = module.vpc.public_subnets[0]
@@ -83,7 +83,7 @@ resource "aws_instance" "web_server" {
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   tags = {
-    Name = "web-server"
+    Name = "ubuntu-server"
     Environment = "production"
   }
   }
